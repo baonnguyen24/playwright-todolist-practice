@@ -153,6 +153,7 @@ class AddingAndDeletingTodoItemsTest {
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog", "Buy some milk");
 
             Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Walk the dog"));
+            item.hover();
             Locator deleteBtn = item.getByTestId("todo-item-button");
             deleteBtn.click();
 
@@ -162,20 +163,48 @@ class AddingAndDeletingTodoItemsTest {
 
         @DisplayName("We can delete an item at the end of the list")
         @Test
-        void deletingAnItemAtTheEndOfTheList() {
+        void deletingAnItemAtTheEndOfTheList(Page page) {
             // TODO: Implement me
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Buy some milk"
             // 3) Verify that the list contains "Feed the cat" and "Walk the dog"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Walk the dog");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Buy some milk");
+            page.getByTestId("text-input").press("Enter");
+
+            Locator item = page.getByTestId("todo-item").last();
+            item.hover();
+            Locator deleteBtn = item.getByTestId("todo-item-button");
+            deleteBtn.click();
+
+            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemUpdated).containsExactly("Feed the cat", "Walk the dog");
         }
 
         @DisplayName("We can delete an item at the start of the list")
         @Test
-        void deletingAnItemAtTheStartOfTheList() {
+        void deletingAnItemAtTheStartOfTheList(Page page) {
             // TODO: Implement me
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Feed the cat"
             // 3) Verify that the list contains "Walk the dog" and "Buy some milk"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Walk the dog");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Buy some milk");
+            page.getByTestId("text-input").press("Enter");
+
+            Locator item = page.getByTestId("todo-item").first();
+            item.hover();
+            Locator deleteBtn = item.getByTestId("todo-item-button");
+            deleteBtn.click();
+
+            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemUpdated).containsExactly("Walk the dog", "Buy some milk");
         }
     }
 }
