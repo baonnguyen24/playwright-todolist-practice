@@ -13,7 +13,7 @@ public class TodoMvcAppPage {
 
     public TodoMvcAppPage(Page page) {
         this.page = page;
-        baseUrl = (StringUtils.isEmpty(System.getenv("APP_HOST_URL"))) ? "http://localhost:7002" : System.getenv("APP_HOST_URL");
+        baseUrl = (StringUtils.isEmpty(System.getenv("APP_HOST_URL"))) ? "http://localhost:8080" : System.getenv("APP_HOST_URL");
     }
 
     public void open() {

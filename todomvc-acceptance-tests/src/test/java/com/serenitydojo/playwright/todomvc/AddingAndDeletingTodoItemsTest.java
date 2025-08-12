@@ -1,15 +1,20 @@
 package com.serenitydojo.playwright.todomvc;
 
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.junit.UsePlaywright;
 import com.serenitydojo.playwright.fixtures.ChromeHeadlessOptions;
 import com.serenitydojo.playwright.todomvc.pageobjects.TodoMvcAppPage;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 @DisplayName("Adding and deleting todo items to the list")
 @Feature("Adding and deleting todo items to the list")
@@ -30,17 +35,20 @@ class AddingAndDeletingTodoItemsTest {
     class WhenTheApplicationStarts {
         @DisplayName("The list should be empty")
         @Test
-        void the_list_should_initially_be_empty() {
+        void the_list_should_initially_be_empty(Page page) {
             // TODO: Implement me
             // 1) Verify that no items are displayed in the todo list
+            PlaywrightAssertions.assertThat(page.getByTestId("todo-list")).not().isVisible();
         }
 
         @DisplayName("The user should be prompted to enter a todo item")
         @Test
-        void the_user_should_be_prompted_to_enter_a_value() {
+        void the_user_should_be_prompted_to_enter_a_value(Page page) {
             // TODO: Implement me
             // 1) Verify that the input field is visible
             // 2) Verify that the placeholder text is "What needs to be done?"
+            PlaywrightAssertions.assertThat(page.getByTestId("text-input")).isVisible();
+            PlaywrightAssertions.assertThat(page.getByPlaceholder("What needs to be done?")).isVisible();
         }
     }
 
@@ -51,43 +59,74 @@ class AddingAndDeletingTodoItemsTest {
 
         @DisplayName("We can add a single item")
         @Test
-        void addingASingleItem() {
+        void addingASingleItem(Page page) {
             // TODO: Implement me
             // 1) Add a single todo item "Feed the cat"
             // 2) Verify that the list contains exactly "Feed the cat"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat");
         }
 
         @DisplayName("We can add multiple items")
         @Test
-        void addingSeveralItem() {
+        void addingSeveralItem(Page page) {
             // TODO: Implement me
             // 1) Add multiple items "Feed the cat" and "Walk the dog"
             // 2) Verify that the list contains exactly "Feed the cat" and "Walk the dog"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Walk the dog");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog");
         }
 
         @DisplayName("We can't add an empty item")
         @Test
-        void addingAnEmptyItem() {
+        void addingAnEmptyItem(Page page) {
             // TODO: Implement me
             // 1) Add a valid item "Feed the cat"
             // 2) Attempt to add an empty item
             // 3) Verify that the list contains only "Feed the cat"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat");
         }
 
         @DisplayName("We can add duplicate items")
         @Test
-        void addingDuplicateItem() {
+        void addingDuplicateItem(Page page) {
             // TODO: Implement me
             // 1) Add items "Feed the cat", "Walk the dog", and "Feed the cat" again
             // 2) Verify that the list contains duplicates in the order they were added
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Walk the dog");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog", "Feed the cat");
         }
 
         @DisplayName("We can add items with non-English characters")
         @Test
-        void addingNonEnglishItems() {
+        void addingNonEnglishItems(Page page) {
             // TODO: Implement me
             // 1) Add items in various languages (e.g., "Feed the cat", "喂猫", "إطعام القط")
             // 2) Verify that each item appears in the list as added
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("喂猫");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("إطعام القط");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "喂猫", "إطعام القط");
         }
     }
 
