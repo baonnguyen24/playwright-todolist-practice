@@ -1,5 +1,6 @@
 package com.serenitydojo.playwright.todomvc;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.junit.UsePlaywright;
@@ -137,11 +138,26 @@ class AddingAndDeletingTodoItemsTest {
 
         @DisplayName("We can delete an item in the middle of the list")
         @Test
-        void deletingAnItemInTheMiddleOfTheList() {
+        void deletingAnItemInTheMiddleOfTheList(Page page) {
             // TODO: Implement me
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Walk the dog"
             // 3) Verify that the list contains "Feed the cat" and "Buy some milk"
+            page.getByTestId("text-input").fill("Feed the cat");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Walk the dog");
+            page.getByTestId("text-input").press("Enter");
+            page.getByTestId("text-input").fill("Buy some milk");
+            page.getByTestId("text-input").press("Enter");
+            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog", "Buy some milk");
+
+            Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Walk the dog"));
+            Locator deleteBtn = item.getByTestId("todo-item-button");
+            deleteBtn.click();
+
+            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
+            Assertions.assertThat(toDoItemUpdated).containsExactly("Feed the cat", "Buy some milk");
         }
 
         @DisplayName("We can delete an item at the end of the list")
