@@ -35,18 +35,10 @@ class CompletingTodoItemsTest {
         // 1) Add "Feed the cat", "Walk the dog", "Buy some milk"
         // 2) Complete "Feed the cat"
         // 3) Check that "Feed the cat" is shown as completed
-        page.getByTestId("text-input").fill("Feed the cat");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Walk the dog");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Buy some milk");
-        page.getByTestId("text-input").press("Enter");
-
-        Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Feed the cat"));
-        item.getByTestId("todo-item-toggle").click();
-
-        List<String> completedItems = page.locator(".completed").allTextContents();
-        Assertions.assertThat(completedItems).containsExactly("Feed the cat");
+        todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
+        todoMvcApp.checkOffItem("Feed the cat");
+        List<String> toDoItemDisplayed = todoMvcApp.completedItems();
+        Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat");
     }
 
     @DisplayName("Completing an item should update the number of items left count")
@@ -56,16 +48,9 @@ class CompletingTodoItemsTest {
         // 1) Add "Feed the cat", "Walk the dog", "Buy some milk"
         // 2) Complete "Feed the cat"
         // 3) Verify the todo count shows "2 items left!"
-        page.getByTestId("text-input").fill("Feed the cat");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Walk the dog");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Buy some milk");
-        page.getByTestId("text-input").press("Enter");
+        todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
 
-        Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Feed the cat"));
-        item.getByTestId("todo-item-toggle").click();
-
+        todoMvcApp.checkOffItem("Feed the cat");
         PlaywrightAssertions.assertThat(page.locator(".todo-count")).hasText("2 items left!");
     }
 
@@ -77,20 +62,14 @@ class CompletingTodoItemsTest {
         // 2) Complete "Walk the dog"
         // 3) Clear the completed items
         // 4) Verify that the remaining items are "Feed the cat" and "Buy some milk"
-        page.getByTestId("text-input").fill("Feed the cat");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Walk the dog");
-        page.getByTestId("text-input").press("Enter");
-        page.getByTestId("text-input").fill("Buy some milk");
-        page.getByTestId("text-input").press("Enter");
+        todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
 
-        Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Walk the dog"));
-        item.getByTestId("todo-item-toggle").click();
+        todoMvcApp.checkOffItem("Walk the dog");
 
         Locator clearComplete = page.locator(".clear-completed");
         clearComplete.click();
 
-        List<String> toDoItems = page.getByTestId("todo-item").allTextContents();
+        List<String> toDoItems = todoMvcApp.toDoItemDisplayed();
         Assertions.assertThat(toDoItems).containsExactly("Feed the cat", "Buy some milk");
     }
 }

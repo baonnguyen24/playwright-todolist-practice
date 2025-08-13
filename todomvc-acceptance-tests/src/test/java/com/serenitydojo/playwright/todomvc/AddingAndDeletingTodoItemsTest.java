@@ -13,8 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 import java.util.List;
 
 @DisplayName("Adding and deleting todo items to the list")
@@ -60,13 +58,13 @@ class AddingAndDeletingTodoItemsTest {
 
         @DisplayName("We can add a single item")
         @Test
-        void addingASingleItem(Page page) {
+        void addingASingleItem() {
             // TODO: Implement me
             // 1) Add a single todo item "Feed the cat"
             // 2) Verify that the list contains exactly "Feed the cat"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItem("Feed the cat");
+
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat");
         }
 
@@ -76,11 +74,8 @@ class AddingAndDeletingTodoItemsTest {
             // TODO: Implement me
             // 1) Add multiple items "Feed the cat" and "Walk the dog"
             // 2) Verify that the list contains exactly "Feed the cat" and "Walk the dog"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Walk the dog");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItems("Feed the cat", "Walk the dog");
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog");
         }
 
@@ -91,10 +86,10 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add a valid item "Feed the cat"
             // 2) Attempt to add an empty item
             // 3) Verify that the list contains only "Feed the cat"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItems("Feed the cat");
+            todoMvcApp.addTodoItems();
+
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat");
         }
 
@@ -104,13 +99,8 @@ class AddingAndDeletingTodoItemsTest {
             // TODO: Implement me
             // 1) Add items "Feed the cat", "Walk the dog", and "Feed the cat" again
             // 2) Verify that the list contains duplicates in the order they were added
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Walk the dog");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Feed the cat");
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog", "Feed the cat");
         }
 
@@ -120,13 +110,8 @@ class AddingAndDeletingTodoItemsTest {
             // TODO: Implement me
             // 1) Add items in various languages (e.g., "Feed the cat", "喂猫", "إطعام القط")
             // 2) Verify that each item appears in the list as added
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("喂猫");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("إطعام القط");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItems("Feed the cat", "喂猫", "إطعام القط");
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "喂猫", "إطعام القط");
         }
     }
@@ -143,21 +128,12 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Walk the dog"
             // 3) Verify that the list contains "Feed the cat" and "Buy some milk"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Walk the dog");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Buy some milk");
-            page.getByTestId("text-input").press("Enter");
-            List<String> toDoItemDisplayed = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog", "Buy some milk");
 
-            Locator item = page.getByTestId("todo-item").filter(new Locator.FilterOptions().setHasText("Walk the dog"));
-            item.hover();
-            Locator deleteBtn = item.getByTestId("todo-item-button");
-            deleteBtn.click();
-
-            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
+            todoMvcApp.deleteItem("Walk the dog");
+            List<String> toDoItemUpdated = todoMvcApp.toDoItemDisplayed();
             Assertions.assertThat(toDoItemUpdated).containsExactly("Feed the cat", "Buy some milk");
         }
 
@@ -168,20 +144,11 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Buy some milk"
             // 3) Verify that the list contains "Feed the cat" and "Walk the dog"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Walk the dog");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Buy some milk");
-            page.getByTestId("text-input").press("Enter");
+            todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
 
-            Locator item = page.getByTestId("todo-item").last();
-            item.hover();
-            Locator deleteBtn = item.getByTestId("todo-item-button");
-            deleteBtn.click();
-
-            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
-            Assertions.assertThat(toDoItemUpdated).containsExactly("Feed the cat", "Walk the dog");
+            todoMvcApp.deleteLastItem();
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Feed the cat", "Walk the dog");
         }
 
         @DisplayName("We can delete an item at the start of the list")
@@ -191,20 +158,12 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Feed the cat"
             // 3) Verify that the list contains "Walk the dog" and "Buy some milk"
-            page.getByTestId("text-input").fill("Feed the cat");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Walk the dog");
-            page.getByTestId("text-input").press("Enter");
-            page.getByTestId("text-input").fill("Buy some milk");
-            page.getByTestId("text-input").press("Enter");
+            todoMvcApp.addTodoItems("Feed the cat", "Walk the dog", "Buy some milk");
 
-            Locator item = page.getByTestId("todo-item").first();
-            item.hover();
-            Locator deleteBtn = item.getByTestId("todo-item-button");
-            deleteBtn.click();
+            todoMvcApp.deleteFirstItem();
+            List<String> toDoItemDisplayed = todoMvcApp.toDoItemDisplayed();
+            Assertions.assertThat(toDoItemDisplayed).containsExactly("Walk the dog", "Buy some milk");
 
-            List<String> toDoItemUpdated = page.getByTestId("todo-item").allTextContents();
-            Assertions.assertThat(toDoItemUpdated).containsExactly("Walk the dog", "Buy some milk");
         }
     }
 }
